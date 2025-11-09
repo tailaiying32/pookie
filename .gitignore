@@ -1,0 +1,4 @@
+server/__pycache__/
+server/uploads/
+server/data.db
+data.db

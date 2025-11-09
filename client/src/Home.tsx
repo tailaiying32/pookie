@@ -1,110 +1,112 @@
-import * as motion from "motion/react-client";
 import { useState, useEffect } from "react";
+import type { FormEvent, ChangeEvent } from "react";
+import Form from "./Form.tsx";
+import Card from "./Card.tsx";
 
 function Home() {
-  const unlockDate = new Date("2025-11-26");
-  const isUnlocked = new Date() >= unlockDate;
-  const [countdown, setCountdown] = useState("");
+	const [cards, setCards] = useState<any[]>([]);
+	const [addingCard, setAddingCard] = useState(false);
 
-  useEffect(() => {
-    const updateCountdown = () => {
-      const now = new Date();
-      const diff = unlockDate.getTime() - now.getTime();
+	// state variables for add card menu
+	const [title, setTitle] = useState("");
+	const [caption, setCaption] = useState("");
+	const [image, setImage] = useState<File | null>(null);
+	const [content, setContent] = useState("");
 
-      if (diff <= 0) {
-        setCountdown("");
-        return;
-      }
+	// loads card data from backend and set it equal to cards
+	useEffect(() => {
+		fetch("http://localhost:5000/cards", { method: "GET" })
+			.then((res) => res.json())
+			.then((cards) => {
+				setCards(cards);
+				console.log(cards);
+			});
+	}, []);
 
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor(
-        (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-      );
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+	// flushes the state variables for adding a card
+	const flushData = () => {
+		setTitle("");
+		setCaption("");
+		setImage(null);
+		setContent("");
+		setAddingCard(false); // Also close the form
+	};
 
-      setCountdown(`${days}d ${hours}h ${minutes}m ${seconds}s`);
-    };
+	// handles setting image
+	const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setImage(e.target.files?.[0] ?? null);
+	};
 
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
+	// adds an image
+	const addCard = async (event: FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
 
-    return () => clearInterval(interval);
-  }, []);
+		if (!image) {
+			alert("Please select an image");
+			return;
+		}
 
-  const navigateToSection = (direction: "left" | "right" | "down") => {
-    const scrollOptions: ScrollToOptions = {
-      behavior: "smooth",
-    };
+		const formData = new FormData();
+		formData.append("title", title);
+		formData.append("caption", caption);
+		formData.append("image", image);
+		formData.append("content", content);
 
-    switch (direction) {
-      case "left":
-        scrollOptions.left = 0;
-        scrollOptions.top = 0;
-        break;
-      case "right":
-        scrollOptions.left = window.innerWidth * 2;
-        scrollOptions.top = 0;
-        break;
-      case "down":
-        if (!isUnlocked) return; // Prevent navigation if locked
-        scrollOptions.left = window.innerWidth;
-        scrollOptions.top = window.innerHeight;
-        break;
-    }
+		try {
+			const response = await fetch("http://127.0.0.1:5000/cards", {
+				method: "POST",
+				body: formData,
+			});
 
-    window.scrollTo(scrollOptions);
-  };
+			if (response.ok) {
+				const data = await response.json();
+				console.log("Card added:", data);
 
-  return (
-    <>
-      <div className="min-h-screen min-w-full relative flex items-center justify-center">
-        <p>Hi pookie!!! this is our home hehehehehehe</p>
+				// Reload cards to show the new one
+				const cardsResponse = await fetch(
+					"http://127.0.0.1:5000/cards"
+				);
+				const updatedCards = await cardsResponse.json();
+				setCards(updatedCards);
 
-        {/* Left Arrow - Gallery */}
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => navigateToSection("left")}
-          className="absolute left-8 top-1/2 -translate-y-1/2 text-4xl p-4 hover:bg-gray-100 rounded-full"
-        >
-          ←
-        </motion.button>
+				flushData();
+			} else {
+				const error = await response.json();
+				console.error("Error adding card:", error);
+				alert(`Failed to add card: ${error.error || "Unknown error"}`);
+			}
+		} catch (error) {
+			console.error("Network error:", error);
+			alert("Failed to add card. Please try again.");
+		}
+	};
 
-        {/* Right Arrow - Notes */}
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => navigateToSection("right")}
-          className="absolute right-8 top-1/2 -translate-y-1/2 text-4xl p-4 hover:bg-gray-100 rounded-full"
-        >
-          →
-        </motion.button>
-
-        {/* Down Arrow - Birthday */}
-        {!isUnlocked && countdown && (
-          <div className="absolute bottom-24 left-1/2 -translate-x-1/2 text-sm text-gray-600 font-mono">
-            {countdown}
-          </div>
-        )}
-        <motion.button
-          whileHover={isUnlocked ? { scale: 1.1 } : {}}
-          whileTap={isUnlocked ? { scale: 0.9 } : {}}
-          onClick={() => navigateToSection("down")}
-          className={`absolute bottom-8 left-1/2 -translate-x-1/2 text-4xl p-4 rounded-full ${
-            isUnlocked
-              ? "hover:bg-gray-100 cursor-pointer"
-              : "opacity-50 cursor-not-allowed bg-gray-200"
-          }`}
-          title={
-            isUnlocked ? "Happy Birthday!" : "Unlocks on November 26, 2025"
-          }
-        >
-          {isUnlocked ? "↓" : "🔒"}
-        </motion.button>
-      </div>
-    </>
-  );
+	return (
+		<>
+			<div className="space-y-6">
+				<h1 className="text-2xl items-center">hi pookie!!!</h1>
+				<button onClick={() => setAddingCard(true)}>Add card</button>
+				{addingCard && (
+					<Form
+						onSubmit={addCard}
+						onCancel={flushData}
+						onImageChange={handleImageChange}
+						title={title}
+						caption={caption}
+						content={content}
+						setTitle={setTitle}
+						setCaption={setCaption}
+						setContent={setContent}
+					/>
+				)}
+				<div className="space-y-6">
+					{cards.map((card) => (
+						<Card card={card}></Card>
+					))}
+				</div>
+			</div>
+		</>
+	);
 }
 
 export default Home;
