@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import type { FormEvent, ChangeEvent } from "react";
 import Form from "./Form.tsx";
 import Card from "./Card.tsx";
+import ExpandedCard from "./ExpandedCard.tsx";
 
 function Home() {
 	const [cards, setCards] = useState<any[]>([]);
 	const [addingCard, setAddingCard] = useState(false);
+	const [activeCard, setActiveCard] = useState(null);
 
 	// state variables for add card menu
 	const [title, setTitle] = useState("");
@@ -37,7 +39,7 @@ function Home() {
 		setImage(e.target.files?.[0] ?? null);
 	};
 
-	// adds an image
+	// adds a card
 	const addCard = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
@@ -83,25 +85,45 @@ function Home() {
 
 	return (
 		<>
+			{activeCard != null && (
+				<ExpandedCard
+					card={activeCard}
+					onClose={() => setActiveCard(null)}
+				/>
+			)}
+
 			<div className="space-y-6">
 				<h1 className="text-2xl items-center">hi pookie!!!</h1>
-				<button onClick={() => setAddingCard(true)}>Add card</button>
-				{addingCard && (
-					<Form
-						onSubmit={addCard}
-						onCancel={flushData}
-						onImageChange={handleImageChange}
-						title={title}
-						caption={caption}
-						content={content}
-						setTitle={setTitle}
-						setCaption={setCaption}
-						setContent={setContent}
-					/>
+				{addingCard || (
+					<button onClick={() => setAddingCard(true)}>
+						Add card
+					</button>
 				)}
-				<div className="space-y-6">
-					{cards.map((card) => (
-						<Card card={card}></Card>
+				{addingCard && (
+					<div className="z-50">
+						<Form
+							onSubmit={addCard}
+							onCancel={flushData}
+							onImageChange={handleImageChange}
+							title={title}
+							caption={caption}
+							content={content}
+							setTitle={setTitle}
+							setCaption={setCaption}
+							setContent={setContent}
+						/>
+					</div>
+				)}
+				<div className="card-grid">
+					{cards.slice(0, 18).map((card) => (
+						<Card
+							setActiveCard={() => {
+								setActiveCard(card);
+								console.log(activeCard);
+							}}
+							card={card}
+							key={card.cardId}
+						/>
 					))}
 				</div>
 			</div>

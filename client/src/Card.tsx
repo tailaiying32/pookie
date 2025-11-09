@@ -8,51 +8,32 @@ interface CardProps {
 		content: string;
 		image?: string;
 	};
+	setActiveCard: () => void;
 }
 
-function Card({ card }: CardProps) {
-	const [orientation, setOrientation] = useState<"portrait" | "landscape">(
-		"landscape"
-	);
-
-	useEffect(() => {
-		if (!card.image) return;
-		const img = new window.Image();
-		img.src = `http://127.0.0.1:5000/${card.image}`;
-		img.onload = () => {
-			setOrientation(
-				img.naturalHeight > img.naturalWidth ? "portrait" : "landscape"
-			);
-		};
-	}, [card.image]);
-
+function Card({ card, setActiveCard }: CardProps) {
 	return (
 		<div
-			key={card.cardId}
-			className="w-96 h-96 flex items-center justify-center m-2 rounded-2xl bg-gray-50 shadow-lg cursor-pointer overflow-hidden relative border border-gray-200"
+			onClick={() => {
+				setActiveCard();
+			}}
+			className="card-closed cursor-pointer transition-transform duration-200 ease-in-out"
 		>
 			{card.image && (
 				<img
 					src={`http://127.0.0.1:5000/${card.image}`}
 					alt={card.title}
-					className={
-						orientation === "landscape"
-							? "absolute max-h-full h-auto w-auto left-0 top-0"
-							: "absolute max-w-full h-auto w-auto left-0 top-0"
-					}
+					className="w-full h-full object-cover"
 				/>
 			)}
-			<div className="relative z-10 w-full text-left">
-				<h2 className="text-lg font-bold text-white mb-2 drop-shadow-sm">
+			{/* <div className="absolute top-0 left-0 z-10 w-full text-left p-4">
+				<h2 className="text-lg font-bold text-white mb-2 text-shadow">
 					{card.title}
 				</h2>
-				<p className="text-sm text-white mb-1 line-clamp-2">
+				<p className="text-xs text-white line-clamp-2 text-shadow">
 					{card.caption}
 				</p>
-				<p className="text-xs text-white line-clamp-2">
-					{card.content}
-				</p>
-			</div>
+			</div> */}
 		</div>
 	);
 }
