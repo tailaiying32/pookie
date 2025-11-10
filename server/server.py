@@ -99,15 +99,92 @@ def cards():
         return jsonify({"status": "deleted"}), 200
 
     elif request.method == "PUT":
-        data = request.get_json()
-        if not data or 'cardId' not in data:
-            return jsonify({"error": "cardId required"}), 400
-        db.execute(
-            "UPDATE cards SET title = ?, caption = ?, image = ?, content = ? WHERE cardId = ?",
-            (data["title"], data["caption"], data["image"], data["content"], data["cardId"])
-        )
-        db.commit()
-        return jsonify({"status": "updated"}), 200
+        if request.content_type and request.content_type.startswith('multipart/form-data'):
+            form = request.form
+            card_id = form.get('cardId')
+
+            if not card_id:
+                return jsonify({"error": "cardId required"}), 400
+
+            try:
+                card_id_int = int(card_id)
+            except (TypeError, ValueError):
+                return jsonify({"error": "Invalid cardId"}), 400
+
+            title = form.get('title')
+            caption = form.get('caption')
+            content = form.get('content')
+
+            if not title or not caption or not content:
+                return jsonify({"error": "Missing required fields"}), 400
+
+            current = db.execute(
+                "SELECT image FROM cards WHERE cardId = ?",
+                (card_id_int,)
+            ).fetchone()
+
+            if current is None:
+                return jsonify({"error": "Card not found"}), 404
+
+            image_path = current["image"]
+            image_file = request.files.get('image')
+
+            if image_file and image_file.filename:
+                if not allowed_file(image_file.filename):
+                    return jsonify({"error": "Invalid file type"}), 400
+
+                filename = secure_filename(image_file.filename)
+                import time
+                filename = f"{int(time.time())}_{filename}"
+                upload_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                image_file.save(upload_path)
+                new_image_path = f"{UPLOAD_FOLDER}/{filename}"
+
+                if image_path and os.path.exists(image_path):
+                    os.remove(image_path)
+
+                image_path = new_image_path
+
+            db.execute(
+                "UPDATE cards SET title = ?, caption = ?, image = ?, content = ? WHERE cardId = ?",
+                (title, caption, image_path, content, card_id_int)
+            )
+            db.commit()
+            return jsonify({"status": "updated"}), 200
+        else:
+            data = request.get_json()
+            if not data or 'cardId' not in data:
+                return jsonify({"error": "cardId required"}), 400
+
+            title = data.get("title")
+            caption = data.get("caption")
+            content = data.get("content")
+
+            if not title or not caption or not content:
+                return jsonify({"error": "Missing required fields"}), 400
+
+            card_id = data["cardId"]
+
+            try:
+                card_id_int = int(card_id)
+            except (TypeError, ValueError):
+                return jsonify({"error": "Invalid cardId"}), 400
+
+            image_path = data.get("image")
+
+            if image_path is None:
+                current = db.execute(
+                    "SELECT image FROM cards WHERE cardId = ?",
+                    (card_id_int,)
+                ).fetchone()
+                image_path = current["image"] if current else None
+
+            db.execute(
+                "UPDATE cards SET title = ?, caption = ?, image = ?, content = ? WHERE cardId = ?",
+                (title, caption, image_path, content, card_id_int)
+            )
+            db.commit()
+            return jsonify({"status": "updated"}), 200
 
 if __name__ == "__main__":
     app.run(debug=True)
