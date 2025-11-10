@@ -25,7 +25,7 @@ function ExpandedCard({ card, onClose }: ExpandedCardProps) {
 			onClick={onClose}
 		>
 			<div
-				className="relative preserve-3d transition-transform duration-700 ease-in-out"
+				className="relative preserve-3d transition-transform duration-450 ease-in-out"
 				style={{
 					transformStyle: "preserve-3d",
 					transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",

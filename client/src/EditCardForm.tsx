@@ -13,6 +13,8 @@ interface EditCardFormProps {
 	selectedImageName: string;
 }
 
+import { useRef } from "react";
+
 function EditCardForm({
 	onSubmit,
 	onCancel,
@@ -25,12 +27,35 @@ function EditCardForm({
 	setContent,
 	selectedImageName,
 }: EditCardFormProps) {
+	const mouseDownInside = useRef(false);
+	const formRef = useRef<HTMLFormElement>(null);
+
+	const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+		if (e.target instanceof Node && formRef.current?.contains(e.target)) {
+			mouseDownInside.current = true;
+		} else {
+			mouseDownInside.current = false;
+		}
+	};
+
+	const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+		if (
+			!mouseDownInside.current &&
+			!(e.target instanceof Node && formRef.current?.contains(e.target))
+		) {
+			onCancel();
+		}
+		mouseDownInside.current = false;
+	};
+
 	return (
 		<div
 			className="fixed inset-0 z-50 flex items-center justify-center backdrop-brightness-25"
-			onClick={onCancel}
+			onMouseDown={handleMouseDown}
+			onMouseUp={handleMouseUp}
 		>
 			<form
+				ref={formRef}
 				onSubmit={onSubmit}
 				className="flex flex-col gap-5 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-8 max-w-sm w-full shadow"
 				onClick={(e) => e.stopPropagation()}

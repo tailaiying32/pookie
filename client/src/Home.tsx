@@ -5,6 +5,7 @@ import ExpandedCard from "./ExpandedCard";
 import type { CardType } from "./CardType";
 import AddCardForm from "./AddCardForm";
 import EditCardForm from "./EditCardForm";
+import { Link } from "react-router-dom";
 
 function Home() {
 	const [cards, setCards] = useState<CardType[]>([]);
@@ -30,6 +31,7 @@ function Home() {
 		fetch("http://localhost:5000/cards", { method: "GET" })
 			.then((res) => res.json())
 			.then((cards: CardType[]) => {
+				console.log(cards);
 				setCards(cards);
 				console.log(cards);
 			});
@@ -186,6 +188,7 @@ function Home() {
 
 	return (
 		<>
+			{/* the expanded card */}
 			{activeCard != null && (
 				<ExpandedCard
 					card={activeCard}
@@ -196,8 +199,18 @@ function Home() {
 			<div className="space-y-6">
 				<h1 className="text-2xl items-center">yipeeee</h1>
 
-				<button onClick={() => setAddingCard(true)}>Add card</button>
+				{/* button group */}
+				<div className="flex space-x-2">
+					<button onClick={() => setAddingCard(true)}>
+						Add card
+					</button>
+					<button>
+						{" "}
+						<Link to="/happybirthday">Click For Surprise!</Link>
+					</button>
+				</div>
 
+				{/* add card form */}
 				{addingCard && (
 					<div className="z-50">
 						<AddCardForm
@@ -215,6 +228,7 @@ function Home() {
 					</div>
 				)}
 
+				{/* edit card form */}
 				{editingCard && (
 					<div className="z-50">
 						<EditCardForm
@@ -231,8 +245,10 @@ function Home() {
 						/>
 					</div>
 				)}
+
+				{/* card grid */}
 				<div className="card-grid">
-					{cards.slice(0, 18).map((card) => (
+					{cards.map((card) => (
 						<Card
 							card={card}
 							setActiveCard={handleOpenCard}
