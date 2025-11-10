@@ -6,6 +6,7 @@ import type { CardType } from "./CardType";
 import AddCardForm from "./AddCardForm";
 import EditCardForm from "./EditCardForm";
 import { Link } from "react-router-dom";
+import "./styles/index.css";
 
 function Home() {
 	const [cards, setCards] = useState<CardType[]>([]);
@@ -199,16 +200,13 @@ function Home() {
 			<div className="space-y-6">
 				<h1 className="text-2xl items-center">yipeeee</h1>
 
-				{/* button group */}
-				<div className="flex space-x-2">
-					<button onClick={() => setAddingCard(true)}>
-						Add card
-					</button>
-					<button>
-						{" "}
-						<Link to="/happybirthday">Click For Surprise!</Link>
-					</button>
+				<div className="absolute top-6 right-6 z-10">
+					<Link className="btn" to="/happybirthday">
+						?
+					</Link>
 				</div>
+
+				<button onClick={() => setAddingCard(true)}>Add card</button>
 
 				{/* add card form */}
 				{addingCard && (
