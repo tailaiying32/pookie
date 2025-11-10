@@ -10,8 +10,7 @@ function HappyBirthDay() {
 
 	return (
 		<>
-			<div className="absolute z-10 top-4 left-4">
-				{" "}
+			<div className="absolute z-10 top-6 left-6">
 				<Link to="/">Back</Link>
 			</div>
 			<div className="min-h-screen min-w-full relative flex flex-col justify-center space-y-6">
@@ -20,7 +19,7 @@ function HappyBirthDay() {
 						setConfetti(true);
 						setTimeout(() => {
 							setActiveCard(true);
-						}, 2000);
+						}, 1750);
 					}}
 				>
 					<GiftBox></GiftBox>
@@ -37,9 +36,27 @@ function HappyBirthDay() {
 					<Confetti
 						particleCount={120}
 						shapeSize={12}
-						spreadDeg={50}
+						spreadDeg={65}
+                        launchSpeed={1.3}
+						colors={[
+							"#a864fd",
+							"#29cdff",
+							"#78ff44",
+							"#ff718d",
+							"#fdff6a",
+						]}
 					/>
-					<Confetti mode="fall" fadeOutHeight={90} />
+					<Confetti
+						mode="fall"
+						fadeOutHeight={90}
+						colors={[
+							"#a864fd",
+							"#29cdff",
+							"#78ff44",
+							"#ff718d",
+							"#fdff6a",
+						]}
+					/>
 				</div>
 			)}
 		</>
