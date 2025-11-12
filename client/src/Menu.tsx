@@ -1,5 +1,5 @@
 import type { CSSProperties, MouseEvent } from "react";
-import type { CardType } from "./CardType";
+import type { CardType } from "./types/CardType";
 
 interface MenuProps {
 	card: CardType;

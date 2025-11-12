@@ -1,7 +1,3 @@
-body {
-	background: black;
-}
-
 .box {
 	position: relative;
 }
@@ -9,7 +5,7 @@ body {
 	content: "";
 	width: 440px;
 	height: 440px;
-	background-color: #89cff0;
+	/* background-color: #89cff0; */
 	position: absolute;
 	z-index: -1;
 	top: 50%;
@@ -104,12 +100,23 @@ body {
 	content: "";
 	width: 83.3333333333px;
 	height: 83.3333333333px;
-	border: 16.6666666667px solid white;
+	border: 16.6666666667px solid transparent;
 	border-radius: 50% 50% 0 50%;
 	position: absolute;
 	bottom: 99%;
 	z-index: -1;
+
+	/* The gradient color */
+	background: linear-gradient(135deg, #ffb347 0%, #ffe29a 100%) border-box;
+
+	/* Make the inside transparent so it looks like just a ribbon loop */
+	-webkit-mask: linear-gradient(#fff 0 0) padding-box,
+		linear-gradient(#fff 0 0);
+	mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+	-webkit-mask-composite: xor;
+	mask-composite: exclude;
 }
+
 .box-bowtie::before {
 	left: 50%;
 	-webkit-transform: translateX(-100%) skew(10deg, 10deg);

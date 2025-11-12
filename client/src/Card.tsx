@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { MouseEvent } from "react";
-import type { CardType } from "./CardType";
+import type { CardType } from "./types/CardType";
 import Menu from "./Menu";
 
 interface CardProps {

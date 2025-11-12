@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import type { FormEvent, ChangeEvent } from "react";
 import Card from "./Card";
 import ExpandedCard from "./ExpandedCard";
-import type { CardType } from "./CardType";
+import type { CardType } from "./types/CardType";
 import AddCardForm from "./AddCardForm";
 import EditCardForm from "./EditCardForm";
 import { Link } from "react-router-dom";
@@ -20,6 +20,7 @@ function Home() {
 	const [image, setImage] = useState<File | null>(null);
 	const [content, setContent] = useState("");
 	const [selectedImageName, setSelectedImageName] = useState("");
+	const [timeUntilSurprise, setTimeUntilSurprise] = useState("");
 
 	const getImageName = (path?: string) => {
 		if (!path) return "";
@@ -64,6 +65,17 @@ function Home() {
 		setContent(card.content);
 		setImage(null);
 		setSelectedImageName(getImageName(card.image));
+	};
+
+	const startAddingCard = () => {
+		setActiveCard(null);
+		setEditingCard(null);
+		setTitle("");
+		setCaption("");
+		setContent("");
+		setImage(null);
+		setSelectedImageName("");
+		setAddingCard(true);
 	};
 
 	// adds a card
@@ -187,9 +199,48 @@ function Home() {
 		}
 	};
 
+	const now = new Date();
+	const surpriseUnlockDate = new Date(now.getFullYear(), 10, 26, 0, 0, 0, 0);
+	const surpriseUnlockTimestamp = surpriseUnlockDate.getTime();
+	const isSurpriseUnlocked = Date.now() >= surpriseUnlockTimestamp;
+
+	useEffect(() => {
+		if (isSurpriseUnlocked) {
+			setTimeUntilSurprise("");
+			return;
+		}
+
+		const formatTimeUntil = (targetMs: number) => {
+			const diff = targetMs - Date.now();
+			if (diff <= 0) {
+				return "";
+			}
+			const totalSeconds = Math.floor(diff / 1000);
+			const days = Math.floor(totalSeconds / 86400);
+			const hours = Math.floor((totalSeconds % 86400) / 3600);
+			const minutes = Math.floor((totalSeconds % 3600) / 60);
+			const seconds = totalSeconds % 60;
+			const parts: string[] = [];
+			if (days) {
+				parts.push(`${days}d`);
+			}
+			parts.push(`${hours.toString().padStart(2, "0")}h`);
+			parts.push(`${minutes.toString().padStart(2, "0")}m`);
+			parts.push(`${seconds.toString().padStart(2, "0")}s`);
+			return parts.join(" ");
+		};
+
+		const updateCountdown = () => {
+			setTimeUntilSurprise(formatTimeUntil(surpriseUnlockTimestamp));
+		};
+
+		updateCountdown();
+		const timerId = window.setInterval(updateCountdown, 1000);
+		return () => window.clearInterval(timerId);
+	}, [isSurpriseUnlocked, surpriseUnlockTimestamp]);
+
 	return (
 		<>
-			{/* the expanded card */}
 			{activeCard != null && (
 				<ExpandedCard
 					card={activeCard}
@@ -197,64 +248,98 @@ function Home() {
 				/>
 			)}
 
-			<div className="space-y-6">
-				<h1 className="text-2xl items-center">yipeeee</h1>
+			<div className="relative min-h-screen bg-white">
+				<div className="max-w-6xl mx-auto space-y-6">
+					<header className="flex flex-col gap-2">
+						<h1 className="text-3xl font-semibold text-gray-900">
+							Gallery
+						</h1>
+					</header>
 
-				<div className="absolute top-6 right-6 z-10">
-					<Link className="btn" to="/happybirthday">
-						?
-					</Link>
+					{addingCard && (
+						<div className="z-50">
+							<AddCardForm
+								onSubmit={addCard}
+								onCancel={flushData}
+								onImageChange={handleImageChange}
+								title={title}
+								caption={caption}
+								content={content}
+								setTitle={setTitle}
+								setCaption={setCaption}
+								setContent={setContent}
+								selectedImageName={selectedImageName}
+							/>
+						</div>
+					)}
+
+					{editingCard && (
+						<div className="z-50">
+							<EditCardForm
+								onSubmit={editCard}
+								onCancel={flushData}
+								onImageChange={handleImageChange}
+								title={title}
+								caption={caption}
+								content={content}
+								setTitle={setTitle}
+								setCaption={setCaption}
+								setContent={setContent}
+								selectedImageName={selectedImageName}
+							/>
+						</div>
+					)}
+
+					<div className="grid grid-cols-1 gap-8 py-8 card-grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
+						{cards.map((card) => (
+							<Card
+								card={card}
+								setActiveCard={handleOpenCard}
+								onDelete={deleteCard}
+								handleEdit={startEditingCard}
+								key={card.cardId}
+							/>
+						))}
+					</div>
 				</div>
 
-				<button onClick={() => setAddingCard(true)}>Add card</button>
+				<div className="fixed bottom-6 right-6 z-30 flex flex-col gap-3 rounded-full items-center">
+					{isSurpriseUnlocked ? (
+						<Link
+							to="/happybirthday"
+							className="flex h-14 w-14 items-center justify-center rounded-xl bg-white text-2xl shadow-lg transition hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-300"
+							aria-label="Open the birthday surprise"
+							title="Open the birthday surprise"
+						>
+							<span className="leading-none">🎁</span>
+						</Link>
+					) : (
+						<>
+							{!isSurpriseUnlocked && timeUntilSurprise && (
+								<div className="text-xs  font-medium uppercase tracking-wide text-gray-600">
+									{timeUntilSurprise}
+								</div>
+							)}
 
-				{/* add card form */}
-				{addingCard && (
-					<div className="z-50">
-						<AddCardForm
-							onSubmit={addCard}
-							onCancel={flushData}
-							onImageChange={handleImageChange}
-							title={title}
-							caption={caption}
-							content={content}
-							setTitle={setTitle}
-							setCaption={setCaption}
-							setContent={setContent}
-							selectedImageName={selectedImageName}
-						/>
-					</div>
-				)}
-
-				{/* edit card form */}
-				{editingCard && (
-					<div className="z-50">
-						<EditCardForm
-							onSubmit={editCard}
-							onCancel={flushData}
-							onImageChange={handleImageChange}
-							title={title}
-							caption={caption}
-							content={content}
-							setTitle={setTitle}
-							setCaption={setCaption}
-							setContent={setContent}
-							selectedImageName={selectedImageName}
-						/>
-					</div>
-				)}
-
-				{/* card grid */}
-				<div className="card-grid">
-					{cards.map((card) => (
-						<Card
-							card={card}
-							setActiveCard={handleOpenCard}
-							onDelete={deleteCard}
-							handleEdit={startEditingCard}
-							key={card.cardId}
-						/>
-					))}
+							<button
+								type="button"
+								disabled
+								className="flex h-14 w-14 items-center justify-center rounded-xl bg-gray-200 text-2xl text-gray-500 shadow-lg"
+								aria-label="Birthday surprise unlocks on November 26"
+								title="Available November 26"
+							>
+								<span className="leading-none">🔒</span>
+							</button>
+						</>
+					)}
+					<button
+						type="button"
+						onClick={startAddingCard}
+						className="flex h-14 w-14 items-center justify-center rounded-full shadow-lg"
+						aria-label="Create a new birthday card"
+					>
+						<span className="leading-none text-2xl">+</span>
+					</button>
 				</div>
 			</div>
 		</>

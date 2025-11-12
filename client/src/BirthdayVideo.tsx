@@ -44,9 +44,17 @@ function BirthdayVideo({ link, onClose }: BirthdayVideoProps) {
 					className="backface-hidden cursor-pointer w-full h-full"
 					style={{ backfaceVisibility: "hidden" }}
 				>
-					<div className="relative rounded-4xl overflow-hidden shadow-2xl w-full h-full bg-white dark:bg-gray-900">
-						<h1>Happy Birthday Pookie!</h1>
-						<h3>Love, Tailai</h3>
+					<div className="relative rounded-4xl overflow-hidden shadow-2xl w-full h-full bg-white dark:bg-gray-900 flex flex-col items-center justify-center p-10">
+						<div className="text-6xl mb-4">🎉</div>
+						<h1 className="text-3xl md:text-4xl font-bold mb-2 text-center">
+							Happy Birthday Pookie!
+						</h1>
+						<h3 className="text-xl md:text-2xl font-medium text-gray-700 text-center mb-4">
+							Love, Tailai
+						</h3>
+						<p className="text-base text-gray-600 text-center">
+							(click to flip and see your surprise!)
+						</p>
 					</div>
 				</div>
 
