@@ -21,7 +21,7 @@ function BirthdayVideo({ link, onClose }: BirthdayVideoProps) {
 
 	return (
 		<div
-			className="fixed inset-0 z-50 flex items-center justify-center backdrop-brightness-25"
+			className="modal-overlay fixed inset-0 z-50 flex items-center justify-center"
 			onClick={onClose}
 		>
 			<div
@@ -44,15 +44,15 @@ function BirthdayVideo({ link, onClose }: BirthdayVideoProps) {
 					className="backface-hidden cursor-pointer w-full h-full"
 					style={{ backfaceVisibility: "hidden" }}
 				>
-					<div className="relative rounded-4xl overflow-hidden shadow-2xl w-full h-full bg-white dark:bg-gray-900 flex flex-col items-center justify-center p-10">
-						<div className="text-6xl mb-4">🎉</div>
-						<h1 className="text-3xl md:text-4xl font-bold mb-2 text-center">
+					<div className="relative rounded-4xl overflow-hidden shadow-2xl w-full h-full soft-gradient flex flex-col items-center justify-center p-10">
+						<div className="text-6xl mb-6">🎉</div>
+						<h1 className="text-3xl md:text-4xl font-bold mb-4 text-center text-theme-ink">
 							Happy Birthday Pookie!
 						</h1>
-						<h3 className="text-xl md:text-2xl font-medium text-gray-700 text-center mb-4">
+						<h3 className="text-xl md:text-2xl font-medium text-theme-muted text-center mb-6">
 							Love, Tailai
 						</h3>
-						<p className="text-base text-gray-600 text-center">
+						<p className="text-base text-theme-muted text-center mt-2">
 							(click to flip and see your surprise!)
 						</p>
 					</div>
@@ -67,7 +67,7 @@ function BirthdayVideo({ link, onClose }: BirthdayVideoProps) {
 						transform: "rotateY(180deg)",
 					}}
 				>
-					<div className="bg-white dark:bg-gray-900 rounded-4xl shadow-2xl overflow-auto w-full h-full border border-gray-200 dark:border-gray-700 flex items-center justify-center">
+					<div className="panel panel-solid surface-alt rounded-4xl overflow-auto w-full h-full flex items-center justify-center">
 						<ReactPlayer
 							src={link}
 							playing={false}

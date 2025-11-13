@@ -240,7 +240,7 @@ function Home() {
 	}, [isSurpriseUnlocked, surpriseUnlockTimestamp]);
 
 	return (
-		<>
+		<div className="theme-app text-theme-ink">
 			{activeCard != null && (
 				<ExpandedCard
 					card={activeCard}
@@ -248,11 +248,11 @@ function Home() {
 				/>
 			)}
 
-			<div className="relative min-h-screen bg-white">
-				<div className="max-w-6xl mx-auto space-y-6">
+			<div className="relative min-h-screen px-4 pb-24 sm:px-8">
+				<div className="max-w-6xl mx-auto space-y-6 pt-10">
 					<header className="flex flex-col gap-2">
-						<h1 className="text-3xl font-semibold text-gray-900">
-							Gallery
+						<h1 className="text-3xl font-semibold text-theme-ink">
+							Our Memories Together ❤️
 						</h1>
 					</header>
 
@@ -307,7 +307,7 @@ function Home() {
 					{isSurpriseUnlocked ? (
 						<Link
 							to="/happybirthday"
-							className="flex h-14 w-14 items-center justify-center rounded-xl bg-white text-2xl shadow-lg transition hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-300"
+							className="fab flex h-14 w-14 items-center justify-center rounded-xl text-2xl"
 							aria-label="Open the birthday surprise"
 							title="Open the birthday surprise"
 						>
@@ -316,7 +316,7 @@ function Home() {
 					) : (
 						<>
 							{!isSurpriseUnlocked && timeUntilSurprise && (
-								<div className="text-xs  font-medium uppercase tracking-wide text-gray-600">
+								<div className="countdown-pill">
 									{timeUntilSurprise}
 								</div>
 							)}
@@ -324,7 +324,7 @@ function Home() {
 							<button
 								type="button"
 								disabled
-								className="flex h-14 w-14 items-center justify-center rounded-xl bg-gray-200 text-2xl text-gray-500 shadow-lg"
+								className="fab flex h-14 w-14 items-center justify-center rounded-xl"
 								aria-label="Birthday surprise unlocks on November 26"
 								title="Available November 26"
 							>
@@ -335,14 +335,14 @@ function Home() {
 					<button
 						type="button"
 						onClick={startAddingCard}
-						className="flex h-14 w-14 items-center justify-center rounded-full shadow-lg"
+						className="fab flex h-14 w-14 items-center justify-center rounded-full"
 						aria-label="Create a new birthday card"
 					>
 						<span className="leading-none text-2xl">+</span>
 					</button>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 }
 

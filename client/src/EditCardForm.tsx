@@ -50,14 +50,14 @@ function EditCardForm({
 
 	return (
 		<div
-			className="fixed inset-0 z-50 flex items-center justify-center backdrop-brightness-25"
+			className="modal-overlay fixed inset-0 z-50 flex items-center justify-center"
 			onMouseDown={handleMouseDown}
 			onMouseUp={handleMouseUp}
 		>
 			<form
 				ref={formRef}
 				onSubmit={onSubmit}
-				className="flex flex-col gap-5 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-8 max-w-sm w-full shadow"
+				className="panel flex flex-col gap-5 p-8 max-w-sm w-full"
 				onClick={(e) => e.stopPropagation()}
 			>
 				<input
@@ -65,17 +65,17 @@ function EditCardForm({
 					onChange={(e) => setTitle(e.target.value)}
 					placeholder="Title"
 					required
-					className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 focus:border-indigo-400 focus:outline-none text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+					className="form-field"
 				/>
 				<input
 					value={caption}
 					onChange={(e) => setCaption(e.target.value)}
 					placeholder="Caption"
 					required
-					className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 focus:border-indigo-400 focus:outline-none text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+					className="form-field"
 				/>
-				<label className="flex items-center gap-3 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 cursor-pointer w-fit hover:border-indigo-400 dark:hover:border-indigo-400 transition">
-					<span className="text-gray-600 dark:text-gray-300 text-base">
+				<label className="form-file cursor-pointer">
+					<span>
 						{selectedImageName
 							? selectedImageName
 							: "Choose image (optional)"}
@@ -87,7 +87,7 @@ function EditCardForm({
 						className="hidden"
 					/>
 				</label>
-				<p className="text-sm text-gray-500 dark:text-gray-400">
+				<p className="text-sm text-theme-muted">
 					Selecting a new file replaces the current image. Leave blank
 					to keep it.
 				</p>
@@ -96,19 +96,16 @@ function EditCardForm({
 					onChange={(e) => setContent(e.target.value)}
 					placeholder="Content"
 					required
-					className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 focus:border-indigo-400 focus:outline-none text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 min-h-20 resize-vertical"
+					className="form-field min-h-20 resize-vertical"
 				/>
 				<div className="flex gap-3 justify-end">
-					<button
-						type="submit"
-						className="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition dark:bg-indigo-500 dark:hover:bg-indigo-600"
-					>
+					<button type="submit" className="btn-primary">
 						Edit Card
 					</button>
 					<button
 						type="button"
 						onClick={onCancel}
-						className="px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+						className="btn-ghost"
 					>
 						Cancel
 					</button>

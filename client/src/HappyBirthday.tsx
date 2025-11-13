@@ -11,9 +11,11 @@ function HappyBirthDay() {
 	return (
 		<>
 			<div className="absolute z-10 top-6 left-6">
-				<Link to="/">Back</Link>
+				<Link to="/" className="btn-ghost">
+					Back
+				</Link>
 			</div>
-			<div className="min-h-screen min-w-full relative flex flex-col justify-center space-y-6">
+			<div className="theme-app min-h-screen min-w-full relative flex flex-col items-center justify-center space-y-6">
 				<div
 					onClick={() => {
 						setConfetti(true);
@@ -37,24 +39,24 @@ function HappyBirthDay() {
 						particleCount={120}
 						shapeSize={12}
 						spreadDeg={65}
-                        launchSpeed={1.3}
+						launchSpeed={1.3}
 						colors={[
-							"#a864fd",
-							"#29cdff",
-							"#78ff44",
-							"#ff718d",
-							"#fdff6a",
+							"#fd804f",
+							"#db9073",
+							"#fde59a",
+							"#fbc4bd",
+							"#c3ddec",
 						]}
 					/>
 					<Confetti
 						mode="fall"
 						fadeOutHeight={90}
 						colors={[
-							"#a864fd",
-							"#29cdff",
-							"#78ff44",
-							"#ff718d",
-							"#fdff6a",
+							"#fd804f",
+							"#db9073",
+							"#fde59a",
+							"#fbc4bd",
+							"#c3ddec",
 						]}
 					/>
 				</div>

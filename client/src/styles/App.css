@@ -1,17 +1,5 @@
 @import "tailwindcss";
 
-/* Responsive grid for cards */
-/* .card-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-	gap: 1.5rem;
-	justify-items: center;
-	align-items: center;
-	width: 100%;
-	margin: 0 auto;
-	max-width: 1200px;
-} */
-
 /* Square card style */
 .card-closed {
 	position: relative;
@@ -21,14 +9,21 @@
 	min-width: 220px;
 	min-height: 220px;
 	max-height: 500px;
-	background: #f3f4f6;
+	background: var(--gradient-sunrise);
 	border-radius: 1.25rem;
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+	box-shadow: var(--shadow-card);
 	overflow: hidden;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-end;
-	border: 1.5px solid #e5e7eb;
+	border: 1.5px solid var(--color-border-strong);
+}
+
+@font-face {
+	font-family: "Tailai";
+	src: url("/fonts/Myfont-Regular 3.ttf") format("truetype");
+	font-weight: normal;
+	font-style: normal;
 }
 
 #root {
@@ -36,4 +31,9 @@
 	margin: 0 auto;
 	padding: 2rem;
 	text-align: center;
+}
+
+.expanded-back {
+	font-family: "Tailai", "Merriweather";
+	color: var(--color-text-primary);
 }

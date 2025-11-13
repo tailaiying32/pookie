@@ -5,7 +5,11 @@
 	content: "";
 	width: 440px;
 	height: 440px;
-	/* background-color: #89cff0; */
+	background: radial-gradient(
+		circle,
+		rgba(195, 221, 236, 0.7),
+		transparent 65%
+	);
 	position: absolute;
 	z-index: -1;
 	top: 50%;
@@ -19,11 +23,10 @@
 	height: 200px;
 	width: 200px;
 	margin-top: 123.3333333333px;
-	background-color: #cc231e;
+	background: linear-gradient(160deg, var(--burning-sand), var(--coral));
 	border-bottom-left-radius: 5%;
 	border-bottom-right-radius: 5%;
-	box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.3);
-	background: linear-gradient(#762c2c, #ff0303);
+	box-shadow: var(--shadow-soft);
 }
 .box-body .img {
 	opacity: 0;
@@ -64,7 +67,7 @@
 	-webkit-transform: translateX(-50%);
 	transform: translateX(-50%);
 	width: 50px;
-	background: linear-gradient(#ffffff, #ffefa0);
+	background: linear-gradient(var(--spindle), rgba(255, 255, 255, 0.9));
 }
 .box-lid {
 	position: absolute;
@@ -74,11 +77,11 @@
 	transform: translateX(-50%);
 	bottom: 90%;
 	height: 40px;
-	background-color: #cc231e;
+	background: linear-gradient(145deg, var(--coral), var(--burning-sand));
 	height: 40px;
 	width: 220px;
 	border-radius: 5%;
-	box-shadow: 0 8px 4px -4px rgba(0, 0, 0, 0.3);
+	box-shadow: var(--shadow-soft);
 }
 .box-lid::after {
 	content: "";
@@ -89,7 +92,7 @@
 	-webkit-transform: translateX(-50%);
 	transform: translateX(-50%);
 	width: 50px;
-	background: linear-gradient(#ffefa0, #fff);
+	background: linear-gradient(var(--golden-glow), rgba(255, 255, 255, 0.95));
 }
 .box-bowtie {
 	z-index: 1;
@@ -107,7 +110,12 @@
 	z-index: -1;
 
 	/* The gradient color */
-	background: linear-gradient(135deg, #ffb347 0%, #ffe29a 100%) border-box;
+	background: linear-gradient(
+			135deg,
+			var(--apricot-peach) 0%,
+			var(--golden-glow) 100%
+		)
+		border-box;
 
 	/* Make the inside transparent so it looks like just a ribbon loop */
 	-webkit-mask: linear-gradient(#fff 0 0) padding-box,

@@ -23,14 +23,14 @@ function Menu({ card, onDelete, onClose, handleEdit, style }: MenuProps) {
 
 	return (
 		<div
-			className="flex flex-col rounded-md shadow-lg py-2"
+			className="menu-panel flex flex-col py-2"
 			style={style}
 			onClick={handleClick}
 			onContextMenu={(event) => event.preventDefault()}
 		>
 			<button
 				type="button"
-				className="px-4 py-2 text-sm text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+				className="text-theme-ink"
 				onClick={() => {
 					handleEdit(card);
 					onClose();
@@ -41,7 +41,7 @@ function Menu({ card, onDelete, onClose, handleEdit, style }: MenuProps) {
 			<button
 				type="button"
 				onClick={handleDelete}
-				className="px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50 dark:hover:bg-red-900/40"
+				className="text-theme-accent"
 			>
 				Delete
 			</button>

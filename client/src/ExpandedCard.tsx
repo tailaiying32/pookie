@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { CardType } from "./types/CardType";
+import "../src/styles/App.css";
 
 interface ExpandedCardProps {
 	card: CardType;
@@ -21,7 +22,7 @@ function ExpandedCard({ card, onClose }: ExpandedCardProps) {
 
 	return (
 		<div
-			className="fixed inset-0 z-50 flex items-center justify-center backdrop-brightness-25"
+			className="modal-overlay fixed inset-0 z-50 flex items-center justify-center"
 			onClick={onClose}
 		>
 			<div
@@ -44,7 +45,7 @@ function ExpandedCard({ card, onClose }: ExpandedCardProps) {
 					className="backface-hidden cursor-pointer w-full h-full"
 					style={{ backfaceVisibility: "hidden" }}
 				>
-					<div className="relative rounded-4xl overflow-hidden shadow-2xl w-full h-full bg-gray-900">
+					<div className="relative rounded-4xl overflow-hidden shadow-2xl w-full h-full soft-gradient">
 						{card.image && (
 							<img
 								src={`http://127.0.0.1:5000/${card.image}`}
@@ -73,27 +74,27 @@ function ExpandedCard({ card, onClose }: ExpandedCardProps) {
 				{/* Back of card */}
 				<div
 					onClick={handleFlip}
-					className="absolute top-0 left-0 backface-hidden w-full h-full"
+					className="absolute top-0 left-0 backface-hidden w-full h-full expanded-back"
 					style={{
 						backfaceVisibility: "hidden",
 						transform: "rotateY(180deg)",
 					}}
 				>
-					<div className="bg-white dark:bg-gray-900 rounded-4xl shadow-2xl p-8 overflow-auto w-full h-full border border-gray-200 dark:border-gray-700">
+					<div className="panel panel-solid surface-alt rounded-4xl p-10 overflow-auto w-full h-full">
 						<div className="flex justify-between items-start mb-6">
 							<div className="text-left">
-								<h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2 text-left">
+								<h2 className="text-4xl font-bold mb-2 text-left text-theme-ink">
 									{card.title}
 								</h2>
-								<p className="text-lg text-gray-600 dark:text-gray-300 text-left">
+								<h2 className="text-2xl text-left text-theme-muted">
 									{card.caption}
-								</p>
+								</h2>
 							</div>
 						</div>
 
 						<div className="prose prose-lg max-w-none">
 							<p
-								className="text-gray-700 dark:text-gray-200 leading-relaxed whitespace-pre-wrap text-justify"
+								className="leading-relaxed whitespace-pre-wrap text-justify text-2xl text-theme-ink"
 								style={{ textAlign: "justify" }}
 							>
 								{card.content}
