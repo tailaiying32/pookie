@@ -5,7 +5,7 @@ conn.execute("""
 CREATE TABLE IF NOT EXISTS cards (
     cardId INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT,
-    caption TEXT,
+	caption TEXT NOT NULL,
     image TEXT,
     content TEXT
 )

@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request, g, send_from_directory
 from flask_cors import CORS
 import sqlite3
 import os
+from datetime import datetime
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -15,6 +16,25 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+ISO_DATE_FORMAT = "%Y-%m-%d"
+
+
+def normalize_caption_date(value):
+    """Validate incoming date strings and normalize to ISO format."""
+    if value is None:
+        return None
+
+    stripped = value.strip()
+    if not stripped:
+        return None
+
+    try:
+        parsed = datetime.strptime(stripped, ISO_DATE_FORMAT)
+    except ValueError:
+        return None
+
+    return parsed.date().isoformat()
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -52,9 +72,13 @@ def cards():
             return jsonify({"error": "No image file provided"}), 400
         
         title = request.form["title"]
-        caption = request.form["caption"]
+        raw_caption = request.form["caption"]
+        caption = normalize_caption_date(raw_caption)
         content = request.form["content"]
         image_file = request.files["image"]
+
+        if caption is None:
+            return jsonify({"error": "Invalid date format. Please use YYYY-MM-DD."}), 400
         
         # Check if file is valid
         if image_file.filename == '':
@@ -112,11 +136,15 @@ def cards():
                 return jsonify({"error": "Invalid cardId"}), 400
 
             title = form.get('title')
-            caption = form.get('caption')
+            raw_caption = form.get('caption')
             content = form.get('content')
 
-            if not title or not caption or not content:
+            if not title or not raw_caption or not content:
                 return jsonify({"error": "Missing required fields"}), 400
+
+            caption = normalize_caption_date(raw_caption)
+            if caption is None:
+                return jsonify({"error": "Invalid date format. Please use YYYY-MM-DD."}), 400
 
             current = db.execute(
                 "SELECT image FROM cards WHERE cardId = ?",
@@ -157,11 +185,15 @@ def cards():
                 return jsonify({"error": "cardId required"}), 400
 
             title = data.get("title")
-            caption = data.get("caption")
+            raw_caption = data.get("caption")
             content = data.get("content")
 
-            if not title or not caption or not content:
+            if not title or not raw_caption or not content:
                 return jsonify({"error": "Missing required fields"}), 400
+
+            caption = normalize_caption_date(raw_caption)
+            if caption is None:
+                return jsonify({"error": "Invalid date format. Please use YYYY-MM-DD."}), 400
 
             card_id = data["cardId"]
 

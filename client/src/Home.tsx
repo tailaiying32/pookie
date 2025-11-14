@@ -7,12 +7,20 @@ import AddCardForm from "./AddCardForm";
 import EditCardForm from "./EditCardForm";
 import { Link } from "react-router-dom";
 import "./styles/index.css";
+import {
+	ensureIsoDateString,
+	isValidIsoDateString,
+	toDateInputValue,
+} from "./utils/date";
 
 function Home() {
 	const [cards, setCards] = useState<CardType[]>([]);
 	const [addingCard, setAddingCard] = useState(false);
 	const [editingCard, setEditingCard] = useState<CardType | null>(null);
 	const [activeCard, setActiveCard] = useState<CardType | null>(null);
+	const [activeMenuCardId, setActiveMenuCardId] = useState<
+		CardType["cardId"] | null
+	>(null);
 
 	// state variables for add/edit card menu
 	const [title, setTitle] = useState("");
@@ -28,15 +36,30 @@ function Home() {
 		return segments[segments.length - 1] ?? path;
 	};
 
+	const normalizeCards = (cardList: CardType[]) =>
+		cardList.map((card) => {
+			const normalizedCaption = ensureIsoDateString(card.caption);
+			return normalizedCaption
+				? { ...card, caption: normalizedCaption }
+				: card;
+		});
+
 	// loads card data from backend and set it equal to cards
 	useEffect(() => {
 		fetch("http://localhost:5000/cards", { method: "GET" })
 			.then((res) => res.json())
-			.then((cards: CardType[]) => {
-				console.log(cards);
-				setCards(cards);
-				console.log(cards);
+			.then((fetchedCards: CardType[]) => {
+				const normalizedCards = normalizeCards(fetchedCards);
+				console.log(fetchedCards);
+				setCards(normalizedCards);
+				console.log(normalizedCards);
 			});
+	}, []);
+
+	useEffect(() => {
+		const handleWindowClick = () => setActiveMenuCardId(null);
+		window.addEventListener("click", handleWindowClick);
+		return () => window.removeEventListener("click", handleWindowClick);
 	}, []);
 
 	// flushes the state variables for adding a card
@@ -61,7 +84,7 @@ function Home() {
 		setActiveCard(null);
 		setEditingCard(card);
 		setTitle(card.title);
-		setCaption(card.caption);
+		setCaption(toDateInputValue(card.caption));
 		setContent(card.content);
 		setImage(null);
 		setSelectedImageName(getImageName(card.image));
@@ -81,6 +104,11 @@ function Home() {
 	// adds a card
 	const addCard = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
+
+		if (!isValidIsoDateString(caption)) {
+			alert("Please select a valid date");
+			return;
+		}
 
 		if (!image) {
 			alert("Please select an image");
@@ -108,7 +136,7 @@ function Home() {
 					"http://127.0.0.1:5000/cards"
 				);
 				const updatedCards: CardType[] = await cardsResponse.json();
-				setCards(updatedCards);
+				setCards(normalizeCards(updatedCards));
 
 				flushData();
 			} else {
@@ -128,6 +156,11 @@ function Home() {
 
 		if (!editingCard) {
 			console.error("Edit requested without a selected card");
+			return;
+		}
+
+		if (!isValidIsoDateString(caption)) {
+			alert("Please select a valid date");
 			return;
 		}
 
@@ -155,7 +188,7 @@ function Home() {
 					"http://127.0.0.1:5000/cards"
 				);
 				const updatedCards: CardType[] = await cardsResponse.json();
-				setCards(updatedCards);
+				setCards(normalizeCards(updatedCards));
 
 				flushData();
 			} else {
@@ -171,6 +204,10 @@ function Home() {
 
 	const handleOpenCard = (card: CardType) => {
 		setActiveCard(card);
+	};
+
+	const handleSetActiveMenu = (cardId: CardType["cardId"] | null) => {
+		setActiveMenuCardId(cardId);
 	};
 
 	const deleteCard = async (cardId: string | number) => {
@@ -297,6 +334,8 @@ function Home() {
 								setActiveCard={handleOpenCard}
 								onDelete={deleteCard}
 								handleEdit={startEditingCard}
+								activeMenuCardId={activeMenuCardId}
+								setActiveMenu={handleSetActiveMenu}
 								key={card.cardId}
 							/>
 						))}

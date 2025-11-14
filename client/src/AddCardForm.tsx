@@ -71,6 +71,7 @@ function AddCardForm({
 					className="form-field"
 				/>
 				<input
+					type="date"
 					value={caption}
 					onChange={(e) => setCaption(e.target.value)}
 					placeholder="Date"

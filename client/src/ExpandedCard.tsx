@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { CardType } from "./types/CardType";
 import "../src/styles/App.css";
+import { formatCaptionDate } from "./utils/date";
 
 interface ExpandedCardProps {
 	card: CardType;
@@ -64,7 +65,7 @@ function ExpandedCard({ card, onClose }: ExpandedCardProps) {
 									{card.title}
 								</h2>
 								<p className="text-white text-lg drop-shadow-lg text-left">
-									{card.caption}
+									{formatCaptionDate(card.caption)}
 								</p>
 							</div>
 						</div>
@@ -87,7 +88,7 @@ function ExpandedCard({ card, onClose }: ExpandedCardProps) {
 									{card.title}
 								</h2>
 								<h2 className="text-2xl text-left text-theme-muted">
-									{card.caption}
+									{formatCaptionDate(card.caption)}
 								</h2>
 							</div>
 						</div>

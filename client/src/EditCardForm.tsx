@@ -68,9 +68,10 @@ function EditCardForm({
 					className="form-field"
 				/>
 				<input
+					type="date"
 					value={caption}
 					onChange={(e) => setCaption(e.target.value)}
-					placeholder="Caption"
+					placeholder="Date"
 					required
 					className="form-field"
 				/>
