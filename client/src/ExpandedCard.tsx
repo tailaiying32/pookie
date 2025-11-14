@@ -1,4 +1,10 @@
-import { useState } from "react";
+import {
+	useState,
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+} from "react";
 import type { CardType } from "./types/CardType";
 import "../src/styles/App.css";
 import { formatCaptionDate } from "./utils/date";
@@ -10,10 +16,47 @@ interface ExpandedCardProps {
 
 function ExpandedCard({ card, onClose }: ExpandedCardProps) {
 	const [isFlipped, setIsFlipped] = useState(false);
+	const contentWrapperRef = useRef<HTMLDivElement>(null);
+	const contentParagraphRef = useRef<HTMLParagraphElement>(null);
+	const [contentFontSize, setContentFontSize] = useState(24);
 
 	const handleFlip = () => {
 		setIsFlipped(!isFlipped);
 	};
+
+	const adjustContentFontSize = useCallback(() => {
+		const container = contentWrapperRef.current;
+		const paragraph = contentParagraphRef.current;
+		if (!container || !paragraph) {
+			return;
+		}
+
+		const MAX_FONT_SIZE = 28;
+		const MIN_FONT_SIZE = 14;
+		let size = MAX_FONT_SIZE;
+
+		paragraph.style.fontSize = `${size}px`;
+
+		while (
+			paragraph.scrollHeight > container.clientHeight &&
+			size > MIN_FONT_SIZE
+		) {
+			size -= 1;
+			paragraph.style.fontSize = `${size}px`;
+		}
+
+		setContentFontSize(size);
+	}, []);
+
+	useLayoutEffect(() => {
+		adjustContentFontSize();
+	}, [adjustContentFontSize, card.content, isFlipped]);
+
+	useEffect(() => {
+		window.addEventListener("resize", adjustContentFontSize);
+		return () =>
+			window.removeEventListener("resize", adjustContentFontSize);
+	}, [adjustContentFontSize]);
 
 	// Fixed card dimensions
 	const cardWidth = "70vw";
@@ -81,7 +124,7 @@ function ExpandedCard({ card, onClose }: ExpandedCardProps) {
 						transform: "rotateY(180deg)",
 					}}
 				>
-					<div className="panel panel-solid surface-alt rounded-4xl p-10 overflow-auto w-full h-full">
+					<div className="panel panel-solid surface-alt rounded-4xl p-10 w-full h-full flex flex-col overflow-hidden">
 						<div className="flex justify-between items-start mb-6">
 							<div className="text-left">
 								<h2 className="text-4xl font-bold mb-2 text-left text-theme-ink">
@@ -93,10 +136,18 @@ function ExpandedCard({ card, onClose }: ExpandedCardProps) {
 							</div>
 						</div>
 
-						<div className="prose prose-lg max-w-none">
+						<div
+							className="prose prose-lg max-w-none flex-1 overflow-hidden"
+							ref={contentWrapperRef}
+						>
 							<p
-								className="leading-relaxed whitespace-pre-wrap text-justify text-2xl text-theme-ink"
-								style={{ textAlign: "justify" }}
+								ref={contentParagraphRef}
+								className="leading-relaxed whitespace-pre-wrap text-justify text-theme-ink"
+								style={{
+									textAlign: "justify",
+									fontSize: `${contentFontSize}px`,
+									lineHeight: 1.6,
+								}}
 							>
 								{card.content}
 							</p>

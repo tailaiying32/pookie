@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { FormEvent, ChangeEvent } from "react";
 import Card from "./Card";
 import ExpandedCard from "./ExpandedCard";
@@ -102,6 +102,8 @@ function Home() {
 	};
 
 	// adds a card
+	const [sortMode, setSortMode] = useState<"created" | "date">("created");
+
 	const addCard = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
@@ -236,6 +238,23 @@ function Home() {
 		}
 	};
 
+	const sortedCards = useMemo(() => {
+		if (sortMode === "created") {
+			return cards;
+		}
+
+		return [...cards].sort((a, b) => {
+			const aDate = a.caption ?? "";
+			const bDate = b.caption ?? "";
+			if (aDate && bDate) {
+				return bDate.localeCompare(aDate);
+			}
+			if (aDate) return -1;
+			if (bDate) return 1;
+			return 0;
+		});
+	}, [cards, sortMode]);
+
 	const now = new Date();
 	const surpriseUnlockDate = new Date(now.getFullYear(), 10, 26, 0, 0, 0, 0);
 	const surpriseUnlockTimestamp = surpriseUnlockDate.getTime();
@@ -253,18 +272,19 @@ function Home() {
 				return "";
 			}
 			const totalSeconds = Math.floor(diff / 1000);
-			const days = Math.floor(totalSeconds / 86400);
-			const hours = Math.floor((totalSeconds % 86400) / 3600);
-			const minutes = Math.floor((totalSeconds % 3600) / 60);
-			const seconds = totalSeconds % 60;
-			const parts: string[] = [];
-			if (days) {
-				parts.push(`${days}d`);
+			if (totalSeconds >= 86400) {
+				const days = Math.floor(totalSeconds / 86400);
+				const hours = Math.floor((totalSeconds % 86400) / 3600);
+				return `${days}d ${hours.toString()}h`;
 			}
-			parts.push(`${hours.toString().padStart(2, "0")}h`);
-			parts.push(`${minutes.toString().padStart(2, "0")}m`);
-			parts.push(`${seconds.toString().padStart(2, "0")}s`);
-			return parts.join(" ");
+			if (totalSeconds >= 3600) {
+				const hours = Math.floor(totalSeconds / 3600);
+				const minutes = Math.floor((totalSeconds % 3600) / 60);
+				return `${hours.toString()}h ${minutes.toString()}min`;
+			}
+			const minutes = Math.floor(totalSeconds / 60);
+			const seconds = totalSeconds % 60;
+			return `${minutes}min ${seconds.toString().padStart(2, "0")}s`;
 		};
 
 		const updateCountdown = () => {
@@ -287,10 +307,32 @@ function Home() {
 
 			<div className="relative min-h-screen px-4 pb-24 sm:px-8">
 				<div className="max-w-6xl mx-auto space-y-6 pt-10">
-					<header className="flex flex-col gap-2">
+					<header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 						<h1 className="text-3xl font-semibold text-theme-ink">
 							Our Memories Together ❤️
 						</h1>
+						<div className="self-start">
+							<button
+								type="button"
+								onClick={() =>
+									setSortMode((prev) =>
+										prev === "created" ? "date" : "created"
+									)
+								}
+								disabled={!cards.length}
+								className="btn-ghost inline-flex items-center gap-2"
+								aria-label="Toggle card sorting"
+							>
+								<span className="text-sm text-theme-muted">
+									Sort by
+								</span>
+								<span className="font-semibold text-theme-ink">
+									{sortMode === "created"
+										? "Date created"
+										: "Date"}
+								</span>
+							</button>
+						</div>
 					</header>
 
 					{addingCard && (
@@ -328,7 +370,7 @@ function Home() {
 					)}
 
 					<div className="grid grid-cols-1 gap-8 py-8 card-grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
-						{cards.map((card) => (
+						{sortedCards.map((card) => (
 							<Card
 								card={card}
 								setActiveCard={handleOpenCard}
@@ -346,7 +388,7 @@ function Home() {
 					{isSurpriseUnlocked ? (
 						<Link
 							to="/happybirthday"
-							className="fab flex h-14 w-14 items-center justify-center rounded-xl text-2xl"
+							className="fab flex h-14 w-14 items-center justify-center text-2xl rounded-full"
 							aria-label="Open the birthday surprise"
 							title="Open the birthday surprise"
 						>
