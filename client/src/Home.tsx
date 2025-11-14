@@ -12,6 +12,7 @@ import {
 	isValidIsoDateString,
 	toDateInputValue,
 } from "./utils/date";
+import { API_BASE } from "./api";
 
 function Home() {
 	const [cards, setCards] = useState<CardType[]>([]);
@@ -46,7 +47,7 @@ function Home() {
 
 	// loads card data from backend and set it equal to cards
 	useEffect(() => {
-		fetch("http://localhost:5000/cards", { method: "GET" })
+		fetch(`${API_BASE}`, { method: "GET" })
 			.then((res) => res.json())
 			.then((fetchedCards: CardType[]) => {
 				const normalizedCards = normalizeCards(fetchedCards);
@@ -124,7 +125,7 @@ function Home() {
 		formData.append("content", content);
 
 		try {
-			const response = await fetch("http://127.0.0.1:5000/cards", {
+			const response = await fetch(`${API_BASE}`, {
 				method: "POST",
 				body: formData,
 			});
@@ -135,7 +136,7 @@ function Home() {
 
 				// Reload cards to show the new one
 				const cardsResponse = await fetch(
-					"http://127.0.0.1:5000/cards"
+					`${API_BASE}`
 				);
 				const updatedCards: CardType[] = await cardsResponse.json();
 				setCards(normalizeCards(updatedCards));
@@ -177,7 +178,7 @@ function Home() {
 		}
 
 		try {
-			const response = await fetch("http://127.0.0.1:5000/cards", {
+			const response = await fetch(`${API_BASE}`, {
 				method: "PUT",
 				body: formData,
 			});
@@ -187,7 +188,7 @@ function Home() {
 				console.log("Card edited:", data);
 
 				const cardsResponse = await fetch(
-					"http://127.0.0.1:5000/cards"
+					`${API_BASE}`
 				);
 				const updatedCards: CardType[] = await cardsResponse.json();
 				setCards(normalizeCards(updatedCards));
@@ -214,7 +215,7 @@ function Home() {
 
 	const deleteCard = async (cardId: string | number) => {
 		try {
-			const response = await fetch("http://127.0.0.1:5000/cards", {
+			const response = await fetch(`${API_BASE}`, {
 				method: "DELETE",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ cardId }),

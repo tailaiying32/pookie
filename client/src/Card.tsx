@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { MouseEvent } from "react";
 import type { CardType } from "./types/CardType";
 import Menu from "./Menu";
+import { API_BASE } from "./api";
 
 interface CardProps {
 	card: CardType;
@@ -44,7 +45,7 @@ function Card({
 		>
 			{card.image && (
 				<img
-					src={`http://127.0.0.1:5000/${card.image}`}
+					src={`${API_BASE}/${card.image}`}
 					alt={card.title}
 					className="w-full h-full object-cover"
 				/>

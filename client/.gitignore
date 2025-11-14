@@ -1,3 +1,6 @@
+fly.toml
+.github\
+
 # Logs
 logs
 *.log

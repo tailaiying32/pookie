@@ -8,6 +8,7 @@ import {
 import type { CardType } from "./types/CardType";
 import "../src/styles/App.css";
 import { formatCaptionDate } from "./utils/date";
+import { API_BASE } from "./api";
 
 interface ExpandedCardProps {
 	card: CardType;
@@ -92,7 +93,7 @@ function ExpandedCard({ card, onClose }: ExpandedCardProps) {
 					<div className="relative rounded-4xl overflow-hidden shadow-2xl w-full h-full soft-gradient">
 						{card.image && (
 							<img
-								src={`http://127.0.0.1:5000/${card.image}`}
+								src={`${API_BASE}/${card.image}`}
 								alt={card.title}
 								className="w-full h-full object-cover"
 								style={{
