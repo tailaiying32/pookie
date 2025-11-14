@@ -5,6 +5,10 @@ import os
 from datetime import datetime
 from werkzeug.utils import secure_filename
 
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+SQLITE_PATH = os.environ.get("SQLITE_PATH", os.path.join(BASE_DIR, "data", "database.db"))
+
+
 app = Flask(__name__)
 CORS(app)
 
@@ -41,7 +45,7 @@ def allowed_file(filename):
 
 def get_db():
     if 'db' not in g:
-        g.db = sqlite3.connect("data.db")
+        g.db = sqlite3.connect(os.path.join("data", "data.db"))
         g.db.row_factory = sqlite3.Row
     return g.db
 
