@@ -47,7 +47,7 @@ function Home() {
 
 	// loads card data from backend and set it equal to cards
 	useEffect(() => {
-		fetch(`${API_BASE}`, { method: "GET" })
+		fetch(`${API_BASE}/cards`, { method: "GET" })
 			.then((res) => res.json())
 			.then((fetchedCards: CardType[]) => {
 				const normalizedCards = normalizeCards(fetchedCards);
@@ -125,7 +125,7 @@ function Home() {
 		formData.append("content", content);
 
 		try {
-			const response = await fetch(`${API_BASE}`, {
+			const response = await fetch(`${API_BASE}/cards`, {
 				method: "POST",
 				body: formData,
 			});
@@ -136,7 +136,7 @@ function Home() {
 
 				// Reload cards to show the new one
 				const cardsResponse = await fetch(
-					`${API_BASE}`
+					`${API_BASE}/cards`
 				);
 				const updatedCards: CardType[] = await cardsResponse.json();
 				setCards(normalizeCards(updatedCards));
@@ -178,7 +178,7 @@ function Home() {
 		}
 
 		try {
-			const response = await fetch(`${API_BASE}`, {
+			const response = await fetch(`${API_BASE}/cards`, {
 				method: "PUT",
 				body: formData,
 			});
@@ -188,7 +188,7 @@ function Home() {
 				console.log("Card edited:", data);
 
 				const cardsResponse = await fetch(
-					`${API_BASE}`
+					`${API_BASE}/cards`
 				);
 				const updatedCards: CardType[] = await cardsResponse.json();
 				setCards(normalizeCards(updatedCards));
@@ -215,7 +215,7 @@ function Home() {
 
 	const deleteCard = async (cardId: string | number) => {
 		try {
-			const response = await fetch(`${API_BASE}`, {
+			const response = await fetch(`${API_BASE}/cards`, {
 				method: "DELETE",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ cardId }),
