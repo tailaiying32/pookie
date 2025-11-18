@@ -29,7 +29,7 @@ function HappyBirthDay() {
 				{activeCard && (
 					<BirthdayVideo
 						onClose={() => setActiveCard(false)}
-						link="https://www.youtube.com/watch?v=YiJn_W5zNNc"
+						link="https://youtu.be/O7jKGKwgZHM"
 					></BirthdayVideo>
 				)}
 			</div>

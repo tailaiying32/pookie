@@ -1,12 +1,7 @@
-import {
-	useState,
-	useCallback,
-	useEffect,
-	useLayoutEffect,
-	useRef,
-} from "react";
+import { useState, useEffect, useCallback } from "react";
+import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { CardType } from "./types/CardType";
-import "../src/styles/App.css";
+import "./styles/App.css";
 import { formatCaptionDate } from "./utils/date";
 import { API_BASE } from "./api";
 
@@ -17,141 +12,86 @@ interface ExpandedCardProps {
 
 function ExpandedCard({ card, onClose }: ExpandedCardProps) {
 	const [isFlipped, setIsFlipped] = useState(false);
-	const contentWrapperRef = useRef<HTMLDivElement>(null);
-	const contentParagraphRef = useRef<HTMLParagraphElement>(null);
-	const [contentFontSize, setContentFontSize] = useState(24);
 
-	const handleFlip = () => {
-		setIsFlipped(!isFlipped);
-	};
-
-	const adjustContentFontSize = useCallback(() => {
-		const container = contentWrapperRef.current;
-		const paragraph = contentParagraphRef.current;
-		if (!container || !paragraph) {
-			return;
-		}
-
-		const MAX_FONT_SIZE = 28;
-		const MIN_FONT_SIZE = 14;
-		let size = MAX_FONT_SIZE;
-
-		paragraph.style.fontSize = `${size}px`;
-
-		while (
-			paragraph.scrollHeight > container.clientHeight &&
-			size > MIN_FONT_SIZE
-		) {
-			size -= 1;
-			paragraph.style.fontSize = `${size}px`;
-		}
-
-		setContentFontSize(size);
+	const toggleFlip = useCallback(() => {
+		setIsFlipped((prev) => !prev);
 	}, []);
 
-	useLayoutEffect(() => {
-		adjustContentFontSize();
-	}, [adjustContentFontSize, card.content, isFlipped]);
+	const handleFaceKeyDown = useCallback(
+		(event: ReactKeyboardEvent<HTMLDivElement>) => {
+			if (event.key === "Enter" || event.key === " ") {
+				event.preventDefault();
+				toggleFlip();
+			}
+		},
+		[toggleFlip]
+	);
 
 	useEffect(() => {
-		window.addEventListener("resize", adjustContentFontSize);
-		return () =>
-			window.removeEventListener("resize", adjustContentFontSize);
-	}, [adjustContentFontSize]);
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === "Escape") {
+				onClose();
+			}
+		};
 
-	// Fixed card dimensions
-	const cardWidth = "70vw";
-	const cardHeight = "70vh";
-	const maxWidth = "600px";
-	const maxHeight = "600px";
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, [onClose]);
 
 	return (
 		<div
 			className="modal-overlay fixed inset-0 z-50 flex items-center justify-center"
 			onClick={onClose}
+			role="dialog"
+			aria-modal="true"
+			aria-label={`${card.title} memory card`}
 		>
 			<div
-				className="relative preserve-3d transition-transform duration-450 ease-in-out"
-				style={{
-					transformStyle: "preserve-3d",
-					transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
-					width: cardWidth,
-					height: cardHeight,
-					maxWidth: maxWidth,
-					maxHeight: maxHeight,
-				}}
-				onClick={(event) => {
-					event.stopPropagation();
-				}}
+				className="expanded-card-wrapper"
+				onClick={(event) => event.stopPropagation()}
 			>
-				{/* Front of card */}
 				<div
-					onClick={handleFlip}
-					className="backface-hidden cursor-pointer w-full h-full"
-					style={{ backfaceVisibility: "hidden" }}
+					className={`expanded-card ${isFlipped ? "is-flipped" : ""}`}
 				>
-					<div className="relative rounded-4xl overflow-hidden shadow-2xl w-full h-full soft-gradient">
+					<div
+						className="expanded-card__face expanded-card__face--front soft-gradient"
+						role="button"
+						tabIndex={0}
+						onClick={toggleFlip}
+						onKeyDown={handleFaceKeyDown}
+					>
 						{card.image && (
 							<img
 								src={`${API_BASE}/${card.image}`}
 								alt={card.title}
-								className="w-full h-full object-cover"
-								style={{
-									objectFit: "cover",
-									objectPosition: "center",
-								}}
 							/>
 						)}
-
-						<div className="absolute top-0 z-10 w-full h-full p-6 flex flex-col items-start text-left">
-							<div className="text-left">
-								<h2 className="text-3xl font-bold text-white mb-2 drop-shadow-lg text-left">
-									{card.title}
-								</h2>
-								<p className="text-white text-lg drop-shadow-lg text-left">
-									{formatCaptionDate(card.caption)}
-								</p>
-							</div>
+						<div className="expanded-card__overlay">
+							<h2 className="expanded-card__title">
+								{card.title}
+							</h2>
+							<p className="expanded-card__date">
+								{formatCaptionDate(card.caption)}
+							</p>
 						</div>
 					</div>
-				</div>
-
-				{/* Back of card */}
-				<div
-					onClick={handleFlip}
-					className="absolute top-0 left-0 backface-hidden w-full h-full expanded-back"
-					style={{
-						backfaceVisibility: "hidden",
-						transform: "rotateY(180deg)",
-					}}
-				>
-					<div className="panel panel-solid surface-alt rounded-4xl p-10 w-full h-full flex flex-col overflow-hidden">
-						<div className="flex justify-between items-start mb-6">
-							<div className="text-left">
-								<h2 className="text-4xl font-bold mb-2 text-left text-theme-ink">
-									{card.title}
-								</h2>
-								<h2 className="text-2xl text-left text-theme-muted">
-									{formatCaptionDate(card.caption)}
-								</h2>
-							</div>
-						</div>
-
-						<div
-							className="prose prose-lg max-w-none flex-1 overflow-hidden"
-							ref={contentWrapperRef}
-						>
-							<p
-								ref={contentParagraphRef}
-								className="leading-relaxed whitespace-pre-wrap text-justify text-theme-ink"
-								style={{
-									textAlign: "justify",
-									fontSize: `${contentFontSize}px`,
-									lineHeight: 1.6,
-								}}
-							>
-								{card.content}
+					<div
+						className="expanded-card__face expanded-card__face--back expanded-back"
+						role="button"
+						tabIndex={0}
+						onClick={toggleFlip}
+						onKeyDown={handleFaceKeyDown}
+					>
+						<div className="expanded-card__header">
+							<h2 className="expanded-card__header-title">
+								{card.title}
+							</h2>
+							<p className="expanded-card__header-date">
+								{formatCaptionDate(card.caption)}
 							</p>
+						</div>
+						<div className="expanded-card__body">
+							<p>{card.content}</p>
 						</div>
 					</div>
 				</div>

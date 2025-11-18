@@ -258,8 +258,18 @@ button[disabled] {
 }
 
 .modal-overlay {
-	background: rgba(80, 94, 100, 0.35);
-	backdrop-filter: blur(4px);
+	background: rgba(80, 94, 100, 0.5);
+	backdrop-filter: blur(8px);
+	padding: 1.5rem;
+}
+
+@supports (padding: max(0px)) {
+	.modal-overlay {
+		padding-top: max(env(safe-area-inset-top), 1.5rem);
+		padding-bottom: max(env(safe-area-inset-bottom), 1.5rem);
+		padding-left: max(env(safe-area-inset-left), 1.5rem);
+		padding-right: max(env(safe-area-inset-right), 1.5rem);
+	}
 }
 
 .menu-panel {

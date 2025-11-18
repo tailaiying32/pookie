@@ -6,22 +6,27 @@ from datetime import datetime
 from werkzeug.utils import secure_filename
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-SQLITE_PATH = os.environ.get("SQLITE_PATH", os.path.join(BASE_DIR, "data", "database.db"))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+os.makedirs(DATA_DIR, exist_ok=True)
 
+# DB path under data/
+SQLITE_PATH = os.environ.get(
+    "SQLITE_PATH",
+    os.path.join(DATA_DIR, "data.db")
+)
 
 app = Flask(__name__)
 CORS(app)
 
-# Add upload configuration
-UPLOAD_FOLDER = 'uploads'
+# Upload config under data/uploads
+UPLOAD_FOLDER = os.path.join(DATA_DIR, "uploads")
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
-# Create uploads directory if it doesn't exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 ISO_DATE_FORMAT = "%Y-%m-%d"
+
 
 
 def normalize_caption_date(value):
@@ -45,7 +50,7 @@ def allowed_file(filename):
 
 def get_db():
     if 'db' not in g:
-        g.db = sqlite3.connect(os.path.join("data", "data.db"))
+        g.db = sqlite3.connect(SQLITE_PATH)
         g.db.row_factory = sqlite3.Row
     return g.db
 
@@ -170,10 +175,10 @@ def cards():
                 filename = f"{int(time.time())}_{filename}"
                 upload_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 image_file.save(upload_path)
-                new_image_path = f"{UPLOAD_FOLDER}/{filename}"
+                new_image_path = f"uploads/{filename}"
 
-                if image_path and os.path.exists(image_path):
-                    os.remove(image_path)
+                if image_path and os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(image_path))):
+                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(image_path)))
 
                 image_path = new_image_path
 
